@@ -1,6 +1,6 @@
 import numpy
 
-dataDir = "data-2016-06-17"
+dataDir = "data-2016-08-03"
 
 dataDir = "data/" + dataDir
 
