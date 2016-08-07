@@ -88,6 +88,6 @@ def go(predictor, modelName):
         print("bad args")
         exit(1)
     elif sys.argv[1] == "train":
-        train(predictor, "logistic")
+        train(predictor, modelName)
     elif sys.argv[1] == "predict":
-        writePredictions(predictor, "logistic")
+        writePredictions(predictor, modelName)
