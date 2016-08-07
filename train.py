@@ -12,7 +12,7 @@ def train(predictor):
 
     preds = predictor(xs=xs)
 
-    opt = tf.train.RMSPropOptimizer(0.03)
+    opt = tf.train.AdadeltaOptimizer()
     opt_op = opt.minimize(logLoss(preds, ys))
 
     loss = logLoss(preds, ys)
