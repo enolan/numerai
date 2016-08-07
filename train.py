@@ -7,9 +7,6 @@ def train(predictor):
     sess = tf.InteractiveSession()
     tf.set_random_seed(19900515)
 
-    ysDat = getTrainYs()
-    xsDat = getTrainFeatures()
-
     ys = tf.placeholder(tf.float32, shape=[None, 1])
     xs = tf.placeholder(tf.float32, shape=[None, 21])
 
@@ -20,6 +17,15 @@ def train(predictor):
 
     tf.initialize_all_variables().run()
 
-    for x in range(1000):
-        opt_op.run(feed_dict={xs: xsDat, ys: ysDat})
-        print(logLoss(preds, ys).eval(feed_dict={ys: ysDat, xs: xsDat}))
+    for i in range(1000000):
+        batchFeatures, batchYs = getMinibatch()
+        opt_op.run(feed_dict={xs: batchFeatures, ys: batchYs})
+        if i % 100 == 0:
+            trainLoss = logLoss(preds, ys).eval(
+                feed_dict={ys: batchYs, xs: batchFeatures})
+            testFeatures, testYs = getTestFeatures(), getTestYs()
+            testLoss = logLoss(preds, ys).eval(
+                feed_dict={ys: testYs, xs: testFeatures})
+            print(
+                'Batch {:6}, epoch {:f}, train loss {:f}, test loss {:f}'
+                .format(i, i/trainData.shape[0], trainLoss, testLoss))
