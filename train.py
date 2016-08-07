@@ -5,6 +5,7 @@ from logLoss import *
 
 def train(predictor):
     sess = tf.InteractiveSession()
+    tf.set_random_seed(19900515)
 
     ysDat = getTrainYs()
     xsDat = getTrainFeatures()
