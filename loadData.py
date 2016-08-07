@@ -27,10 +27,10 @@ def getMinibatch():
     global minibatchIdx
     if minibatchIdx + minibatchSize < trainData.shape[0]:
         minibatch = trainData[minibatchIdx:minibatchIdx+minibatchSize, :]
+        minibatchIdx += minibatchSize
     else:
         minibatch = trainData[minibatchIdx:, :]
         minibatchIdx = 0
-    minibatchIdx += minibatchSize
     return getFeatures(minibatch), getYs(minibatch)
 
 def getTrainFeatures():
