@@ -54,3 +54,20 @@ def train(predictor, modelName):
             print(
                 'Batch {:6}, epoch {:f}, train loss {:f}, test loss {:f}'
                 .format(i, i/trainData.shape[0], trainLoss, testLoss))
+
+def writePredictions(predictor, modelName):
+    sess = tf.InteractiveSession()
+
+    xs = tf.placeholder(tf.float32, shape=[None, 21])
+    tf.initialize_all_variables().run()
+
+    maybeCheckpoint = tf.train.latest_checkpoint("params", latest_filename=modelName + "-latest")
+    if maybeCheckpoint != None:
+        tf.train.Saver().restore(sess, maybeCheckpoint)
+    else:
+        print("no checkpoint found")
+        exit(1)
+
+    preds = predictor(xs).eval(feed_dict = {xs: getTournamentData()})
+    out = numpy.concatenate((getTournamentTids(), preds), 1)
+    numpy.savetxt(modelName + "-out.csv", out, delimiter=',', fmt=["%i", "%f"], comments="", header="\"t_id\",\"probability\"")

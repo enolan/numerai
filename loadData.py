@@ -44,3 +44,11 @@ def getTestFeatures():
 
 def getTestYs():
     return getYs(testData)
+
+tournamentDataIn = numpy.loadtxt(dataDir + "/numerai_tournament_data.csv", skiprows=1, delimiter=',')
+
+def getTournamentData():
+    return tournamentDataIn[:, 1:]
+
+def getTournamentTids():
+    return tournamentDataIn[:, 0:1]
