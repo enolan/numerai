@@ -1,6 +1,7 @@
 import tensorflow as tf
 from loadData import *
 from logLoss import *
+import sys
 
 
 def train(predictor, modelName):
@@ -71,3 +72,12 @@ def writePredictions(predictor, modelName):
     preds = predictor(xs).eval(feed_dict = {xs: getTournamentData()})
     out = numpy.concatenate((getTournamentTids(), preds), 1)
     numpy.savetxt(modelName + "-out.csv", out, delimiter=',', fmt=["%i", "%f"], comments="", header="\"t_id\",\"probability\"")
+
+def go(predictor, modelName):
+    if len(sys.argv) != 2:
+        print("bad args")
+        exit(1)
+    elif sys.argv[1] == "train":
+        train(predictor, "logistic")
+    elif sys.argv[1] == "predict":
+        writePredictions(predictor, "logistic")
