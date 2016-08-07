@@ -70,6 +70,7 @@ def writePredictions(predictor, modelName):
     sess = tf.InteractiveSession()
 
     xs = tf.placeholder(tf.float32, shape=[None, 21])
+    preds = predictor(xs)
     tf.initialize_all_variables().run()
 
     maybeCheckpoint = tf.train.latest_checkpoint("params", latest_filename=modelName + "-latest")
@@ -79,8 +80,8 @@ def writePredictions(predictor, modelName):
         print("no checkpoint found")
         exit(1)
 
-    preds = predictor(xs).eval(feed_dict = {xs: getTournamentData()})
-    out = numpy.concatenate((getTournamentTids(), preds), 1)
+    predsArr = preds.eval(feed_dict = {xs: getTournamentData()})
+    out = numpy.concatenate((getTournamentTids(), predsArr), 1)
     numpy.savetxt(modelName + "-out.csv", out, delimiter=',', fmt=["%i", "%f"], comments="", header="\"t_id\",\"probability\"")
 
 def go(predictor, modelName):
