@@ -1,10 +1,13 @@
 import tensorflow as tf
 from loadData import *
 from logLoss import *
+from timer import Timer
 import sys
 
 
 def train(predictor, modelName):
+    timer = Timer()
+
     sess = tf.InteractiveSession()
     tf.set_random_seed(19900515)
 
@@ -36,22 +39,29 @@ def train(predictor, modelName):
     else:
         print("no checkpoint found")
 
+    timer.measure("initialization")
+
     for i in range(trainData.shape[0]*5):
         batchFeatures, batchYs = getMinibatch()
         opt_op.run(feed_dict={xs: batchFeatures, ys: batchYs})
-        if i % 100 == 0:
+        if i % 2000 == 0:
+            timer.measure("2000 descent iterations")
+
             trainLoss, trainLossSummary = sess.run(
                 [loss, merged],
                 feed_dict = {ys: batchYs, xs: batchFeatures})
             trainWriter.add_summary(trainLossSummary, i)
+            timer.measure("train loss computation")
 
             testFeatures, testYs = getTestFeatures(), getTestYs()
             testLoss, testLossSummary = sess.run(
                 [loss, merged],
                 feed_dict = {ys: testYs, xs: testFeatures})
             testWriter.add_summary(testLossSummary, i)
+            timer.measure("test loss computation")
 
             saver.save(sess, paramPath, global_step=i, latest_filename=modelName + "-latest")
+            timer.measure("saving")
             print(
                 'Batch {:6}, epoch {:f}, train loss {:f}, test loss {:f}'
                 .format(i, i/trainData.shape[0], trainLoss, testLoss))
