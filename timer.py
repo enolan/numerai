@@ -9,7 +9,3 @@ class Timer:
         print('{: <40} finished, {:5f} ms since last measurement'.
               format(str, diff.total_seconds() * 1000))
         self.last = now
-
-foo = Timer()
-time.sleep(2)
-foo.measure("sleep")
