@@ -41,7 +41,7 @@ def train(predictor, modelName):
 
     timer.measure("initialization")
 
-    for i in range(int(trainData.shape[0]/minibatchSize*10000)):
+    for i in range(int(trainData.shape[0]/minibatchSize*1000000)):
         batchFeatures, batchYs = getMinibatch()
         opt_op.run(feed_dict={xs: batchFeatures, ys: batchYs})
         if i % 2000 == 0:

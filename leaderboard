@@ -1,4 +1,9 @@
 on test set
-constant          : 0.693071
-logistic          : 0.692171
-smallnn(128,relu) : 0.691443
+constant
+  0.693071
+logistic
+  0.692171
+logistic(bigger batches)
+  0.692235 (stopped early)
+smallnn(128,relu)
+  0.691443
