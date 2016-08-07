@@ -3,7 +3,7 @@ from loadData import *
 from logLoss import *
 
 
-def train(predictor):
+def train(predictor, modelName):
     sess = tf.InteractiveSession()
     tf.set_random_seed(19900515)
 
@@ -19,8 +19,9 @@ def train(predictor):
 
     tf.scalar_summary("loss", loss)
     merged = tf.merge_all_summaries()
-    trainWriter = tf.train.SummaryWriter("logs/train", sess.graph)
-    testWriter = tf.train.SummaryWriter("logs/test")
+    logDir = "logs/" + modelName
+    trainWriter = tf.train.SummaryWriter(logDir + "/train", sess.graph)
+    testWriter = tf.train.SummaryWriter(logDir + "/test")
 
     tf.initialize_all_variables().run()
 
