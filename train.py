@@ -41,7 +41,7 @@ def train(predictor, modelName):
 
     timer.measure("initialization")
 
-    for i in range(trainData.shape[0]*5):
+    for i in range(int(trainData.shape[0]/minibatchSize*200)):
         batchFeatures, batchYs = getMinibatch()
         opt_op.run(feed_dict={xs: batchFeatures, ys: batchYs})
         if i % 2000 == 0:
@@ -64,7 +64,7 @@ def train(predictor, modelName):
             timer.measure("saving")
             print(
                 'Batch {:6}, epoch {:f}, train loss {:f}, test loss {:f}'
-                .format(i, i/trainData.shape[0], trainLoss, testLoss))
+                .format(i, i*minibatchSize/trainData.shape[0], trainLoss, testLoss))
 
 def writePredictions(predictor, modelName):
     sess = tf.InteractiveSession()
