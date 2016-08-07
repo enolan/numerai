@@ -23,7 +23,17 @@ def train(predictor, modelName):
     trainWriter = tf.train.SummaryWriter(logDir + "/train", sess.graph)
     testWriter = tf.train.SummaryWriter(logDir + "/test")
 
+    saver = tf.train.Saver()
+    paramPath = "params/" + modelName
+
     tf.initialize_all_variables().run()
+
+    print("loading params")
+    maybeCheckpoint = tf.train.latest_checkpoint("params", latest_filename=modelName + "-latest")
+    if maybeCheckpoint != None:
+        saver.restore(sess, maybeCheckpoint)
+    else:
+        print("no checkpoint found")
 
     for i in range(trainData.shape[0]*5):
         batchFeatures, batchYs = getMinibatch()
@@ -33,11 +43,14 @@ def train(predictor, modelName):
                 [loss, merged],
                 feed_dict = {ys: batchYs, xs: batchFeatures})
             trainWriter.add_summary(trainLossSummary, i)
+
             testFeatures, testYs = getTestFeatures(), getTestYs()
             testLoss, testLossSummary = sess.run(
                 [loss, merged],
                 feed_dict = {ys: testYs, xs: testFeatures})
             testWriter.add_summary(testLossSummary, i)
+
+            saver.save(sess, paramPath, global_step=i, latest_filename=modelName + "-latest")
             print(
                 'Batch {:6}, epoch {:f}, train loss {:f}, test loss {:f}'
                 .format(i, i/trainData.shape[0], trainLoss, testLoss))
