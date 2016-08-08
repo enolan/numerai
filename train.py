@@ -14,7 +14,7 @@ def train(predictor, modelName):
     ys = tf.placeholder(tf.float32, shape=[None, 1])
     xs = tf.placeholder(tf.float32, shape=[None, 21])
 
-    preds = predictor(xs=xs)
+    preds = predictor(xs)
 
     opt = tf.train.AdadeltaOptimizer()
     opt_op = opt.minimize(logLoss(preds, ys))
