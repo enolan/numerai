@@ -1,7 +1,7 @@
 import numpy
 import math
 
-dataDir = "data-2016-08-03"
+dataDir = "data-2016-08-10"
 minibatchSize = 200 # I guessed. No idea what is optimal.
 
 numpy.random.seed(19900515)
