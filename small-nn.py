@@ -4,7 +4,7 @@ import train
 def computeKeep(isTraining, prob):
     return (1 - isTraining * (1 - prob))
 
-def mkLayer(xs, outputs, keep_prob, act_fn, maxNormConstraint, name):
+def mkLayer(xs, outputs, keep_prob, bias_init, act_fn, maxNormConstraint, name):
     with tf.name_scope("mkLayer-" + name) as scope:
         numInputs = xs.get_shape().as_list()[-1]
         weight_shape = [numInputs, outputs]
@@ -14,7 +14,7 @@ def mkLayer(xs, outputs, keep_prob, act_fn, maxNormConstraint, name):
         tf.histogram_summary(name + "-norm-weights", norms)
         maxNorm = tf.reduce_max(norms)
         tf.scalar_summary(name + "-max-norm", tf.reduce_max(norms))
-        biases = tf.Variable(tf.constant(0.01, shape = [outputs]))
+        biases = tf.Variable(tf.constant(bias_init, shape = [outputs]))
         tf.histogram_summary(name + "-biases", biases)
         sums = tf.matmul(xs, weights) + biases
         sumsDropped = tf.nn.dropout(sums, keep_prob)
@@ -26,10 +26,10 @@ def mkLayer(xs, outputs, keep_prob, act_fn, maxNormConstraint, name):
 
 def predict(xs, isTraining):
     inputDropped = tf.nn.dropout(xs, computeKeep(isTraining, 0.95))
-    hidden1, hidden1Op = mkLayer(inputDropped, 128, (computeKeep(isTraining, 0.5)), tf.nn.relu, 4, "hidden1")
+    hidden1, hidden1Op = mkLayer(inputDropped, 128, (computeKeep(isTraining, 0.5)), 0.01, tf.nn.relu, 4, "hidden1")
 #    hidden = tf.contrib.layers.fully_connected(inputDropped, num_outputs = 256, activation_fn = tf.nn.relu)
     # hidden2, hidden2Op = mkLayer(hidden1, 512, computeKeep(isTraining, 1), tf.nn.relu, 9.11, "hidden2")
-    out, outOp = mkLayer(hidden1, 1, 1, tf.sigmoid, 100000, "output")
+    out, outOp = mkLayer(hidden1, 1, 1, 0.5, tf.sigmoid, 100000, "output")
     combinedOp = tf.group(hidden1Op, outOp)
     return out, combinedOp
 
