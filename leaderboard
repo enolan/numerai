@@ -1,4 +1,6 @@
 on test set
+
+--- 2016-08-03 ---
 constant
   0.693071
 logistic
@@ -7,3 +9,15 @@ logistic(bigger batches)
   0.692235 (stopped early)
 smallnn(128,relu)
   0.691443
+
+--- 2016-08-10 ---
+constant
+  0.693130
+logistic (whitened eps=1e-5)
+  0.692845
+logistic whitened eps=1e-1
+  0.692744
+logistic whitened eps=1
+  0.692868
+logistic (unwhitened)
+  0.692427
