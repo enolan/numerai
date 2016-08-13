@@ -1,7 +1,7 @@
 import tensorflow as tf
 
 def logLoss(preds, ys):
-    epsilon = 1e-15
+    epsilon = 1e-7
     preds2 = tf.maximum(preds, epsilon)
     preds2 = tf.minimum(preds2, 1-epsilon)
     posLogLoss = tf.mul(ys, tf.log(preds2))

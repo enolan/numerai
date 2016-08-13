@@ -13,14 +13,19 @@ def train(predictor, modelName):
 
     ys = tf.placeholder(tf.float32, shape=[None, 1])
     xs = tf.placeholder(tf.float32, shape=[None, 21])
+    isTraining = tf.placeholder(tf.float32, shape=[])
 
-    preds = predictor(xs)
-
-    opt = tf.train.AdadeltaOptimizer()
-    opt_op = opt.minimize(logLoss(preds, ys))
-
+    preds, preDescentOp = predictor(xs, isTraining)
     loss = logLoss(preds, ys)
 
+    global_step = tf.Variable(0)
+    # learning_rate = tf.train.exponential_decay(0.001, global_step, trainData.shape[0]/minibatchSize*20, 0.95, staircase=True)
+    # opt = tf.train.MomentumOptimizer(learning_rate, 0.95) # tf.train.RMSPropOptimizer(learning_rate, momentum=0.99)
+    # opt = tf.train.RMSPropOptimizer(learning_rate)
+    opt = tf.train.AdamOptimizer()
+    opt_op = opt.minimize(loss, global_step = global_step)
+
+    # tf.scalar_summary("learning rate", learning_rate)
     tf.scalar_summary("loss", loss)
     merged = tf.merge_all_summaries()
     logDir = "logs/" + modelName
@@ -41,30 +46,35 @@ def train(predictor, modelName):
 
     timer.measure("initialization")
 
-    for i in range(int(trainData.shape[0]/minibatchSize*1000000)):
+    for i in range(int(trainData.shape[0]/minibatchSize*2000000)):
         batchFeatures, batchYs = getMinibatch()
-        opt_op.run(feed_dict={xs: batchFeatures, ys: batchYs})
+        # grads = opt.compute_gradients(loss)
+        # for g in grads:
+        #     print(g[0].eval(feed_dict={xs: batchFeatures, ys:batchYs, isTraining: 1}))
+        #     print(g[1].eval())
+        preDescentOp.run()
+        opt_op.run(feed_dict={xs: batchFeatures, ys: batchYs, isTraining: 1})
         if i % 2000 == 0:
             timer.measure("2000 descent iterations")
 
-            trainLoss, trainLossSummary = sess.run(
-                [loss, merged],
-                feed_dict = {ys: batchYs, xs: batchFeatures})
-            trainWriter.add_summary(trainLossSummary, i)
+            trainLoss, trainLossSummary, step_count = sess.run(
+                [loss, merged, global_step],
+                feed_dict = {ys: batchYs, xs: batchFeatures, isTraining: 0})
+            trainWriter.add_summary(trainLossSummary, step_count)
             timer.measure("train loss computation")
 
             testFeatures, testYs = getTestFeatures(), getTestYs()
             testLoss, testLossSummary = sess.run(
                 [loss, merged],
-                feed_dict = {ys: testYs, xs: testFeatures})
-            testWriter.add_summary(testLossSummary, i)
+                feed_dict = {ys: testYs, xs: testFeatures, isTraining: 0})
+            testWriter.add_summary(testLossSummary, step_count)
             timer.measure("test loss computation")
 
             saver.save(sess, paramPath, global_step=i, latest_filename=modelName + "-latest")
             timer.measure("saving")
             print(
                 'Batch {:6}, epoch {:f}, train loss {:f}, test loss {:f}'
-                .format(i, i*minibatchSize/trainData.shape[0], trainLoss, testLoss))
+                .format(step_count, step_count*minibatchSize/trainData.shape[0], trainLoss, testLoss))
 
 def writePredictions(predictor, modelName):
     sess = tf.InteractiveSession()
