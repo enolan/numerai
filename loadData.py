@@ -2,7 +2,7 @@ import numpy
 import math
 
 dataDir = "data-2016-08-03"
-minibatchSize = 20000 # I guessed. No idea what is optimal.
+minibatchSize = 200 # I guessed. No idea what is optimal.
 
 numpy.random.seed(19900515)
 
@@ -31,6 +31,7 @@ def getMinibatch():
     else:
         minibatch = trainData[minibatchIdx:, :]
         minibatchIdx = 0
+        numpy.random.shuffle(trainData)
     return getFeatures(minibatch), getYs(minibatch)
 
 def getTrainFeatures():
