@@ -80,7 +80,7 @@ def writePredictions(predictor, modelName):
     sess = tf.InteractiveSession()
 
     xs = tf.placeholder(tf.float32, shape=[None, 21])
-    preds = predictor(xs)
+    preds, _preDescentOp = predictor(xs, 0)
     tf.initialize_all_variables().run()
 
     maybeCheckpoint = tf.train.latest_checkpoint("params", latest_filename=modelName + "-latest")
