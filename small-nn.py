@@ -26,12 +26,12 @@ def mkLayer(xs, outputs, keep_prob, bias_init, act_fn, maxNormConstraint, name):
     # return tf.Print(tf.nn.relu(sumsDropped), [sumsDropped], summarize=1000000000)
 
 def predict(xs, isTraining):
-    inputDropped = tf.nn.dropout(xs, computeKeep(isTraining, 0.95))
-    hidden1, hidden1Op = mkLayer(inputDropped, 128, (computeKeep(isTraining, 0.5)), 0.01, tf.nn.relu, 4, "hidden1")
-#    hidden = tf.contrib.layers.fully_connected(inputDropped, num_outputs = 256, activation_fn = tf.nn.relu)
-    # hidden2, hidden2Op = mkLayer(hidden1, 512, computeKeep(isTraining, 1), tf.nn.relu, 9.11, "hidden2")
-    out, outOp = mkLayer(hidden1, 1, 1, 0.5, tf.sigmoid, 100000, "output")
-    combinedOp = tf.group(hidden1Op, outOp)
+    inputDropped = tf.nn.dropout(xs, computeKeep(isTraining, 0.9))
+    hidden1, hidden1Op = mkLayer(inputDropped, 512, (computeKeep(isTraining, 0.4)), 0.0, tf.nn.relu, 4, "hidden1")
+    hidden2, hidden2Op = mkLayer(hidden1, 512, (computeKeep(isTraining, 0.4)), 0.0, tf.nn.relu, 4, "hidden2")
+    hidden3, hidden3Op = mkLayer(hidden2, 512, (computeKeep(isTraining, 0.4)), 0.0, tf.nn.relu, 4, "hidden3")
+    out, outOp = mkLayer(hidden3, 1, 1, 0., tf.sigmoid, 100000, "output")
+    combinedOp = tf.group(hidden1Op, hidden2Op, hidden3Op, outOp)
     return out, combinedOp
 
 train.go(predict, "smallnn")
