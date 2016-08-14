@@ -19,13 +19,9 @@ def train(predictor, modelName):
     loss = logLoss(preds, ys)
 
     global_step = tf.Variable(0)
-    # learning_rate = tf.train.exponential_decay(0.001, global_step, trainData.shape[0]/minibatchSize*20, 0.95, staircase=True)
-    # opt = tf.train.MomentumOptimizer(learning_rate, 0.95) # tf.train.RMSPropOptimizer(learning_rate, momentum=0.99)
-    # opt = tf.train.RMSPropOptimizer(learning_rate)
     opt = tf.train.AdamOptimizer()
     opt_op = opt.minimize(loss, global_step = global_step)
 
-    # tf.scalar_summary("learning rate", learning_rate)
     tf.scalar_summary("loss", loss)
     merged = tf.merge_all_summaries()
     logDir = "logs/" + modelName
@@ -48,10 +44,6 @@ def train(predictor, modelName):
 
     for i in range(int(trainData.shape[0]/minibatchSize*2000000)):
         batchFeatures, batchYs = getMinibatch()
-        # grads = opt.compute_gradients(loss)
-        # for g in grads:
-        #     print(g[0].eval(feed_dict={xs: batchFeatures, ys:batchYs, isTraining: 1}))
-        #     print(g[1].eval())
         preDescentOp.run()
         opt_op.run(feed_dict={xs: batchFeatures, ys: batchYs, isTraining: 1})
         if i % 2000 == 0:
