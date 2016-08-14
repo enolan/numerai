@@ -23,17 +23,10 @@ def getFeatures(mat):
 def getYs(mat):
     return mat[:, -1:]
 
-# This actually hurts performance.
-# means_train = numpy.mean(getFeatures(trainData), axis=0)
-# centered_train = getFeatures(trainData) - means_train
-# cov_mat_train = numpy.cov(centered_train, rowvar=False)
-# U,S,V = numpy.linalg.svd(cov_mat_train)
-# centered_all = getFeatures(trainDataIn) - means_train
-# rot_all = numpy.dot(centered_all, U)
-# white_all = rot_all / numpy.sqrt(S + 1)
-# back_again_all = numpy.dot(white_all * numpy.sqrt(S + 1e-5), numpy.linalg.inv(U)) + means_train
-# trainDataIn_orig = numpy.copy(trainDataIn)
-# trainDataIn[:, :-1] = white_all
+means_train = numpy.mean(getFeatures(trainData), axis=0)
+centered_all = getFeatures(trainDataIn) - means_train
+trainDataIn_orig = numpy.copy(trainDataIn)
+trainDataIn[:, :-1] = centered_all
 
 def getMinibatch():
     global minibatchIdx
