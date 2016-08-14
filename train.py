@@ -1,4 +1,5 @@
 import tensorflow as tf
+import shutil
 from loadData import *
 from logLoss import *
 from timer import Timer
@@ -42,6 +43,9 @@ def train(predictor, modelName):
 
     timer.measure("initialization")
 
+    min_test_loss = None
+    best_iter = 0
+
     for i in range(int(trainData.shape[0]/minibatchSize*2000000)):
         batchFeatures, batchYs = getMinibatch()
         preDescentOp.run()
@@ -62,7 +66,24 @@ def train(predictor, modelName):
             testWriter.add_summary(testLossSummary, step_count)
             timer.measure("test loss computation")
 
-            saver.save(sess, paramPath, global_step=i, latest_filename=modelName + "-latest")
+            if min_test_loss == None or testLoss < min_test_loss:
+                min_test_loss = testLoss
+                best_iter = step_count
+                print("updating min_test_loss = {:f}, best_iter = {}".
+                      format(min_test_loss, best_iter))
+
+            elif best_iter + 10000 <= step_count:
+                print("No improvement in 10000 iterations, min_test_loss = {:f}".
+                      format(min_test_loss))
+                exit(0)
+
+            saver.save(sess, paramPath, global_step=step_count, latest_filename=modelName + "-latest")
+            if best_iter == step_count:
+                file_suffixes = ["", ".meta"]
+                for suff in file_suffixes:
+                    shutil.copyfile(paramPath + "-" + str(step_count) + suff,
+                                    paramPath + "-" + suff + "best")
+
             timer.measure("saving")
             print(
                 'Batch {:6}, epoch {:f}, train loss {:f}, test loss {:f}'
