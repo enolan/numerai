@@ -6,7 +6,7 @@ from timer import Timer
 import sys
 
 
-def train(predictor, modelName):
+def train(predictor, modelName, hyperparams):
     timer = Timer()
 
     sess = tf.InteractiveSession()
@@ -16,7 +16,7 @@ def train(predictor, modelName):
     xs = tf.placeholder(tf.float32, shape=[None, 21])
     isTraining = tf.placeholder(tf.float32, shape=[])
 
-    preds, preDescentOp = predictor(xs, isTraining)
+    preds, preDescentOp = predictor(xs, isTraining, hyperparams)
     loss = logLoss(preds, ys)
 
     global_step = tf.Variable(0)
@@ -107,11 +107,11 @@ def writePredictions(predictor, modelName):
     out = numpy.concatenate((getTournamentTids(), predsArr), 1)
     numpy.savetxt(modelName + "-out.csv", out, delimiter=',', fmt=["%i", "%f"], comments="", header="\"t_id\",\"probability\"")
 
-def go(predictor, modelName):
+def go(predictor, modelName, hyperparams):
     if len(sys.argv) != 2:
         print("bad args")
         exit(1)
     elif sys.argv[1] == "train":
-        train(predictor, modelName)
+        train(predictor, modelName, hyperparams)
     elif sys.argv[1] == "predict":
-        writePredictions(predictor, modelName)
+        writePredictions(predictor, hyperparams, modelName)
