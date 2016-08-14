@@ -2,7 +2,8 @@ import tensorflow as tf
 import train
 
 def computeKeep(isTraining, prob):
-    return (1 - isTraining * (1 - prob))
+    with tf.name_scope("computeKeep"):
+        return (1 - isTraining * (1 - prob))
 
 def mkLayer(xs, outputs, keep_prob, bias_init, act_fn, maxNormConstraint, name):
     with tf.name_scope("mkLayer-" + name) as scope:
