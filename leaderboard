@@ -21,3 +21,15 @@ logistic whitened eps=1
   0.692868
 logistic (unwhitened)
   0.692427
+
+--- 2016-08-17 --=
+logistic (minibatch size 20)
+  0.690953 (0.69116 on leaderboard)
+nn - 512-512-512 (tbPktIjiZkV5klJtBNOyMIhH118jqoyb)
+  0.690932
+nn - 21 (THGsyfezIZWMwUUJVYghihKZiFDdWrdj)
+  0.690683 (0.69081 on leaderboard)
+nn - 23 (Cc1CYxyTDlxumV7J5YajtONfe9U9qIh0)
+  0.690641 (0.69167 on leaderboard)
+autosklearn (1 hr)
+  0.69125
