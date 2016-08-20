@@ -191,7 +191,8 @@ def hypersearch(predictor, modelName, hyperparam_search_dict):
             sampled_params_resolved = resolve_hyper_fns(sampled_params)
             with open("hyperparams", 'w') as h:
                 h.write(str(sampled_params))
-            print("starting run with params {}".format(sampled_params))
+                print("starting run {}".format(run_id))
+            print("params: {}".format(sampled_params))
             min_test_loss, final_test_loss, final_train_loss, finished_early = train(predictor, modelName, sampled_params_resolved)
             tf.reset_default_graph()
             csv.write("{},{},{},{},{},{},".
