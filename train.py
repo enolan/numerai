@@ -10,7 +10,7 @@ from timer import Timer
 import sys
 
 
-def train(predictor, modelName, hyperparams):
+def train(predictor, modelName, is_autoencoder, hyperparams):
     timer = Timer()
 
     with tf.Session() as sess:
@@ -22,7 +22,10 @@ def train(predictor, modelName, hyperparams):
         isTraining = tf.placeholder(tf.float32, shape=[])
 
         preds, preDescentOp = predictor(xs, isTraining, hyperparams)
-        loss = logLoss(preds, ys)
+        if is_autoencoder:
+            loss = tf.contrib.losses.sum_of_squares(xs,preds)
+        else:
+            loss = logLoss(preds, ys)
 
         global_step = tf.Variable(0)
         opt = tf.train.AdamOptimizer()
@@ -54,20 +57,33 @@ def train(predictor, modelName, hyperparams):
         for i in range(int(trainData.shape[0]/minibatch_size*200)):
             batchFeatures, batchYs = getMinibatch(minibatch_size)
             preDescentOp.run(session=sess)
-            opt_op.run(session=sess, feed_dict={xs: batchFeatures, ys: batchYs, isTraining: 1})
+            if is_autoencoder:
+                opt_op.run(session=sess, feed_dict={xs: batchFeatures, isTraining: 1})
+            else:
+                opt_op.run(session=sess, feed_dict={xs: batchFeatures, ys: batchYs, isTraining: 1})
             if i % 2000 == 0:
                 timer.measure("2000 descent iterations")
 
-                trainLoss, trainLossSummary, step_count = sess.run(
-                    [loss, merged, global_step],
-                    feed_dict = {ys: batchYs, xs: batchFeatures, isTraining: 0})
+                if is_autoencoder:
+                    trainLoss, trainLossSummary, step_count = sess.run(
+                        [loss, merged, global_step],
+                        feed_dict = {ys: batchYs, isTraining: 0})
+                else:
+                    trainLoss, trainLossSummary, step_count = sess.run(
+                        [loss, merged, global_step],
+                        feed_dict = {ys: batchYs, xs: batchFeatures, isTraining: 0})
                 trainWriter.add_summary(trainLossSummary, step_count)
                 timer.measure("train loss computation")
 
                 testFeatures, testYs = getTestFeatures(), getTestYs()
-                testLoss, testLossSummary = sess.run(
-                    [loss, merged],
-                    feed_dict = {ys: testYs, xs: testFeatures, isTraining: 0})
+                if is_autoencoder:
+                    testLoss, testLossSummary = sess.run(
+                        [loss, merged],
+                        feed_dict = {xs: testFeatures, isTraining: 0})
+                else:
+                    testLoss, testLossSummary = sess.run(
+                        [loss, merged],
+                        feed_dict = {ys: testYs, xs: testFeatures, isTraining: 0})
                 testWriter.add_summary(testLossSummary, step_count)
                 timer.measure("test loss computation")
 
@@ -176,7 +192,7 @@ def csv_dict_vals(in_dict):
             res += str(in_dict[k]) + ","
     return res
 
-def hypersearch(predictor, modelName, hyperparam_search_dict):
+def hypersearch(predictor, modelName, is_autoencoder, hyperparam_search_dict):
     with open(modelName + "-search.csv", 'w', buffering=1) as csv:
         csv.write("id,min test loss,final test loss,final train loss,diff,finished early,")
         for label in mk_cols(hyperparam_search_dict):
@@ -193,7 +209,7 @@ def hypersearch(predictor, modelName, hyperparam_search_dict):
                 h.write(str(sampled_params))
                 print("starting run {}".format(run_id))
             print("params: {}".format(sampled_params))
-            min_test_loss, final_test_loss, final_train_loss, finished_early = train(predictor, modelName, sampled_params_resolved)
+            min_test_loss, final_test_loss, final_train_loss, finished_early = train(predictor, modelName, is_autoencoder, sampled_params_resolved)
             tf.reset_default_graph()
             csv.write("{},{},{},{},{},{},".
                       format(run_id, min_test_loss, final_test_loss,
@@ -201,7 +217,7 @@ def hypersearch(predictor, modelName, hyperparam_search_dict):
             csv.write(csv_dict_vals(sampled_params_resolved) + "\n")
             os.chdir("../..")
 
-def go(predictor, modelName, hyperparam_search_dict):
+def go(predictor, modelName, is_autoencoder, hyperparam_search_dict):
     if len(sys.argv) < 2 or len(sys.argv) > 4:
         print("bad args")
         exit(1)
@@ -211,8 +227,8 @@ def go(predictor, modelName, hyperparam_search_dict):
         handle.close()
         hyperparams_unresolved = ast.literal_eval(hyperparams_str)
         hyperparams = resolve_hyper_fns(hyperparams_unresolved)
-        train(predictor, modelName, hyperparams)
+        train(predictor, modelName, is_autoencoder, hyperparams)
     elif sys.argv[1] == "hypersearch":
-        hypersearch(predictor, modelName, hyperparam_search_dict)
+        hypersearch(predictor, modelName, is_autoencoder, hyperparam_search_dict)
     elif sys.argv[1] == "predict":
         writePredictions(predictor, modelName)
