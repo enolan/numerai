@@ -7,4 +7,4 @@ tf.histogram_summary("weights", weights)
 def predict(xs, _isTraining, _hyperparams):
     return 1 / (1 + tf.exp(-tf.matmul(xs, weights))), tf.no_op()
 
-go(predict, "logistic", {})
+go(predict, "logistic", {'minibatch_size': 20})

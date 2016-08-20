@@ -28,11 +28,11 @@ centered_all = getFeatures(trainDataIn) - means_train
 trainDataIn_orig = numpy.copy(trainDataIn)
 trainDataIn[:, :-1] = centered_all
 
-def getMinibatch():
+def getMinibatch(minibatch_size):
     global minibatchIdx
-    if minibatchIdx + minibatchSize < trainData.shape[0]:
-        minibatch = trainData[minibatchIdx:minibatchIdx+minibatchSize, :]
-        minibatchIdx += minibatchSize
+    if minibatchIdx + minibatch_size < trainData.shape[0]:
+        minibatch = trainData[minibatchIdx:minibatchIdx+minibatch_size, :]
+        minibatchIdx += minibatch_size
     else:
         minibatch = trainData[minibatchIdx:, :]
         minibatchIdx = 0
