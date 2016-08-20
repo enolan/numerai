@@ -52,6 +52,9 @@ def getTestYs():
     return getYs(testData)
 
 tournamentDataIn = numpy.loadtxt(dataDir + "/numerai_tournament_data.csv", skiprows=1, delimiter=',')
+tournamentDataIn_orig = numpy.copy(tournamentDataIn)
+centered_tournament = tournamentDataIn[:, 1:] - means_train
+tournamentDataIn[:, 1:] = centered_tournament
 
 def getTournamentData():
     return tournamentDataIn[:, 1:]
