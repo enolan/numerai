@@ -20,7 +20,7 @@ hidden_params = {
                  "outputs":   (10,100),
                  "act_fn":    "relu"}
 
-train.go(predict, "smallnn", False,
+train.go(predict, "smallnn",
          {
              "hidden": hidden_params,
              "output": {
