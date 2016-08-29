@@ -8,7 +8,7 @@ def predict(xs, isTraining, hyperparams):
     hyp = copy.deepcopy(hyperparams)
     hyp["hidden1"] = hyperparams["hidden"]
     inputDropped = tf.nn.dropout(xs, l.compute_keep(isTraining, hyp["input_keep_prob"]))
-    hidden1, hidden1Op = l.mklayer(inputDropped, "hidden1", hyp)
+    hidden1, hidden1Op = l.mklayer(inputDropped, isTraining, "hidden1", hyp)
     out, outOp = l.mklayer(hidden1, "output", hyp)
     combinedOp = tf.group(hidden1Op, outOp)
     return out, combinedOp

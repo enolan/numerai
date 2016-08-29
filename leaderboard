@@ -33,3 +33,10 @@ nn - 23 (Cc1CYxyTDlxumV7J5YajtONfe9U9qIh0)
   0.690641 (0.69167 on leaderboard)
 autosklearn (1 hr)
   0.69125
+
+autoencoder single 32 unit hidden layer, input dropout 0.8, no hidden dropout, rho 0.01
+  6.837e-3
+same, 2 unit hidden layer
+  0.08313
+autoencoder, 2 512 relu unit hidden layers, dropout 0.8, no sparsity penalty
+  3e-4

@@ -13,6 +13,8 @@ def resolve_hyper_fns(hyperparams):
             res[k] = tf.nn.relu
         elif v == "sigmoid":
             res[k] = tf.sigmoid
+        elif v == "identity":
+            res[k] = tf.identity
         else:
             res[k] = v
     return res
